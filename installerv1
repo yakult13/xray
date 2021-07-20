@@ -66,7 +66,7 @@ function installCertBot() {
 function ScriptMessage(){
  echo -e ""
  echo -e " \033[0;36m(｡◕‿◕｡)\033[0m \033[0;31mXRAY Installer \033[0m"
- echo -e " \033[0;36m(｡◕‿◕｡)\033[0m \033[0;31mmix xray src \033[0m"
+ echo -e " \033[0;36m\mix xray src \033[0m"
  echo -e " \033[0;31m Script Created:\033[0m \033[0;36mGVPNHUB-Juan\033[0m"
  echo -e ""
 
