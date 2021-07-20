@@ -1,0 +1,117 @@
+#!/bin/bash
+# Laravel Installer
+# Script by Juan
+# 
+# Illegal selling and redistribution of this script is strictly prohibited
+# Please respect author's Property
+# Binigay sainyo ng libre, ipamahagi nyo rin ng libre.
+#
+#
+
+ # Now check if our machine is in root user, if not, this script exits
+ # If you're on sudo user, run `sudo su -` first before running this script
+if [[ $EUID -ne 0 ]];then
+ ScriptMessage
+ echo -e "[\e[1;31mError\e[0m] This script must be run as root, exiting..."
+ exit 1
+fi
+
+# FUNCTIONS AND COMMAND
+
+# Reset
+Color_Off='\033[0m'       # Text Reset
+
+# Regular Colors
+
+Red='\033[0;31m'          # Red
+Green='\033[0;32m'        # Green
+Yellow='\033[0;33m'       # Yellow
+Purple='\033[0;35m'       # Purple
+Cyan='\033[0;36m'         # Cyan
+
+read -p "Enter your domain:" DOMAIN
+read -p "Enter your email:" EMAIL
+
+function ip_address(){
+  local IP="$( ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1 )"
+  [ -z "${IP}" ] && IP="$( wget -qO- -t1 -T2 ipv4.icanhazip.com )"
+  [ -z "${IP}" ] && IP="$( wget -qO- -t1 -T2 ipinfo.io/ip )"
+  [ ! -z "${IP}" ] && echo "${IP}" || echo
+} 
+IPADDR="$(ip_address)"
+
+function Update() {
+    sudo apt-get update -y 
+    sudo apt-get upgrade -y
+    sudo apt install curl -y
+
+}
+
+function runv2() {
+    bash <(curl -Ls https://blog.sprov.xyz/v2-ui.sh)
+}
+
+function installv2() {
+    v2-ui install
+}
+
+function installCertBot() {
+    sudo apt install software-properties-common
+    sudo add-apt-repository ppa:certbot/certbot
+    sudo apt-get install certbot
+
+}
+
+    
+function ScriptMessage(){
+ echo -e ""
+ echo -e " \033[0;36m(｡◕‿◕｡)\033[0m \033[0;31mXRAY Installer \033[0m"
+ echo -e " \033[0;36m(｡◕‿◕｡)\033[0m \033[0;31mmix xray src \033[0m"
+ echo -e " \033[0;31m Script Created:\033[0m \033[0;36mGVPNHUB-Juan\033[0m"
+ echo -e ""
+
+}
+
+# START INSTALLING
+ ScriptMessage
+ 
+ sleep 2
+
+echo -e "\033[0;33m Updatin... \033[0m"
+ Update
+
+echo -e "\033[0;33m Getting XRAY \033[0m"
+ runv2
+
+echo -e "\033[0;33m Installing XRAY \033[0m"
+ installv2
+
+echo -e "\033[0;33m Installing CertBot \033[0m"
+ installCertBot
+
+echo -e "\033[0;33m Provide Domain and Email \033[0m"
+ sudo certbot certonly --standalone --preferred-challenges http --agree-tos --email ${EMAIL} -d ${DOMAIN}
+
+ # clearing all logs in screen
+ clear
+
+ ScriptMessage
+
+ echo -e ""
+echo -e "\033[0;33m Success Installation \033[0m"
+echo -e "\033[0;35m Site: $IPADDR/65432 \033[0m"
+echo -e "\033[0;36m User and Pass: admin \033[0m"
+echo -e ""
+echo -e " Certificate Path"
+echo -e " /etc/letsencrypt/live/${DOMAIN}/fullchain.pem"
+echo -e " /etc/letsencrypt/live/${DOMAIN}/privkey.pem"
+echo -e ""
+echo -e "\033[0;33m Script NOT FOR SALE \033[0m"
+echo -e "\033[0;33m REPORT to kakatol@ninjadns.net \033[0m"
+
+ # Clearing all logs from installation
+ rm -rf /root/.bash_history && history -c && echo '' > /var/log/syslog
+
+rm -rf /root/installer*
+
+exit 1
