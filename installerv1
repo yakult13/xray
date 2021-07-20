@@ -62,11 +62,20 @@ function installCertBot() {
 
 }
 
+function BBR() {
+    modprobe tcp_bbr
+    echo "tcp_bbr" >> /etc/modules-load.d/modules.conf
+    echo "net.core.default_qdisc=fq
+          net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+    sysctl -p
+    lsmod | grep bbr
+}
+
     
 function ScriptMessage(){
  echo -e ""
  echo -e " \033[0;36m(｡◕‿◕｡)\033[0m \033[0;31mXRAY Installer \033[0m"
- echo -e " \033[0;36m\mix xray src \033[0m"
+ echo -e " \033[0;36m mix xray src \033[0m"
  echo -e " \033[0;31m Script Created:\033[0m \033[0;36mGVPNHUB-Juan\033[0m"
  echo -e ""
 
@@ -80,14 +89,19 @@ function ScriptMessage(){
 echo -e "\033[0;33m Updatin... \033[0m"
  Update
 
+clear
 echo -e "\033[0;33m Getting XRAY \033[0m"
  runv2
 
+clear
 echo -e "\033[0;33m Installing XRAY \033[0m"
  installv2
 
+clear
 echo -e "\033[0;33m Installing CertBot \033[0m"
  installCertBot
+
+clear
 
 echo -e "\033[0;33m Provide Domain and Email \033[0m"
  sudo certbot certonly --standalone --preferred-challenges http --agree-tos --email ${EMAIL} -d ${DOMAIN}
