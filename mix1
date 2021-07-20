@@ -1,4 +1,4 @@
-unction BBR() {
+function BBR() {
     wget -O kernel.sh 'https://github.com/kirin10000/update-kernel/raw/master/update-kernel-stable.sh' && chmod +x kernel.sh && ./kernel.sh
     
 }
