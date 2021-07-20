@@ -90,15 +90,19 @@ echo -e "\033[0;33m Updatin... \033[0m"
  Update
 
 clear
-echo -e "\033[0;33m Getting XRAY \033[0m"
+echo -e "\033[0;33m Getting XRAY... \033[0m"
  runv2
 
 clear
-echo -e "\033[0;33m Installing XRAY \033[0m"
+echo -e "\033[0;33m Installing XRAY... \033[0m"
  installv2
 
 clear
-echo -e "\033[0;33m Installing CertBot \033[0m"
+echo -e "\033[0;33m Installing BBR... "
+ BBR
+clear
+
+echo -e "\033[0;33m Installing CertBot.. \033[0m"
  installCertBot
 
 clear
