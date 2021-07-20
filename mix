@@ -1,0 +1,19 @@
+unction BBR() {
+    wget -O kernel.sh 'https://github.com/kirin10000/update-kernel/raw/master/update-kernel-stable.sh' && chmod +x kernel.sh && ./kernel.sh
+    
+}
+temp_bbr="$BBR"
+
+function grep() {
+    if [ "$(sysctl net.ipv4.tcp_congestion_control | cut -d = -f 2 | awk '{print $1}')" == "$temp_bbr" ] && [ "$(sysctl net.core.default_qdisc | cut -d = -f 2 | awk '{print $1}')" == "$(grep '^[ '$'\t]*net.core.default_qdisc[ '$'\t]*=' "/etc/sysctl.conf" | tail -n 1 | cut -d = -f 2 | awk '{print $1}')" ]; then
+                    green "--------------------$temp_bbr已安装--------------------"
+                else
+                    red "开启$temp_bbr失败"
+                    red "如果刚安装完内核，请先重启"
+                    red "如果重启仍然无效，请尝试选项3"
+                fi
+}
+
+BBR
+
+grep
