@@ -63,12 +63,32 @@ function installCertBot() {
 }
 
 function BBR() {
-    modprobe tcp_bbr
-    echo "tcp_bbr" >> /etc/modules-load.d/modules.conf
-    echo "net.core.default_qdisc=fq
-          net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
-    sysctl -p
-    lsmod | grep bbr
+    sed -i '/^\*\ *soft\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
+    sed -i '/^\*\ *hard\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
+    echo '* soft nofile 65536' >>/etc/security/limits.conf
+    echo '* hard nofile 65536' >>/etc/security/limits.conf
+    echo '' > /root/.bash_history && history -c && echo '' > /var/log/syslog
+
+   F1='/etc/modules-load.d/modules.conf' && { [[ $(grep -cE '^tcp_bbr$' $F1) -ge 1 ]] && echo "bbr already added" || echo "tcp_bbr" >> "$F1"; } && modprobe tcp_bbr
+   F2='net.core.default_qdisc' && F3='net.ipv4.tcp_congestion_control' && sed -i "/^$F2.*/d;/^$F3.*/d" /etc/sysctl{.conf,.d/*.conf} && echo -e "${F2}=fq\n${F3}=bbr" >> /etc/sysctl.d/98-bbr.conf && sysctl --system &>/dev/null
+
+   sed -ir "/\(#n\|n\)et.ipv4.tcp_timestamps.*/d;/\(#n\|n\)et.ipv4.tcp_sack.*/d;/\(#n\|n\)et.core.netdev_max_backlog.*/d;/\(#n\|n\)et.ipv4.tcp_low_latency.*/d" /etc/sysctl{.conf,.d/*.conf}
+   printf "%b\n" " # GVPNHUB Server tuning
+   net.ipv4.tcp_timestamps = 0
+   net.ipv4.tcp_sack = 0
+   net.core.netdev_max_backlog = 250000
+   net.ipv4.tcp_low_latency = 1" > /etc/sysctl.d/80-gvpnhub-tuning.conf
+   sed -ir "/\(#n\|n\)et.core.\(netdev\|rmem\|wmem\|optmem\).*/d;/\(#n\|n\)et.ipv4.\(tcp\|udp\)_\(mem\|rmem\|wmem\).*/d" /etc/sysctl{.conf,.d/*.conf}
+   printf "%s" "net.core.rmem_max = 16777216
+   net.core.wmem_max = 16777216
+   net.core.rmem_default = 16777216
+   net.core.wmem_default = 16777216
+   net.core.optmem_max = 16777216
+   net.ipv4.tcp_mem = 16777216 16777216 16777216
+   net.ipv4.udp_mem = 16777216 16777216 16777216
+   net.ipv4.tcp_rmem = 4096 87380 16777216
+   net.ipv4.tcp_wmem = 4096 65536 16777216" >> /etc/sysctl.d/80-gvpnhub-tuning.conf
+   sysctl --system &>/dev/null
 }
 
     
