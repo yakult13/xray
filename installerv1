@@ -16,8 +16,6 @@ if [[ $EUID -ne 0 ]];then
  exit 1
 fi
 
-# FUNCTIONS AND COMMAND
-
 # Reset
 Color_Off='\033[0m'       # Text Reset
 
@@ -32,7 +30,7 @@ Cyan='\033[0;36m'         # Cyan
 read -p "Enter your domain:" DOMAIN
 read -p "Enter your email:" EMAIL
 
-function ip_address(){
+function ip_address() {
   local IP="$( ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1 )"
   [ -z "${IP}" ] && IP="$( wget -qO- -t1 -T2 ipv4.icanhazip.com )"
   [ -z "${IP}" ] && IP="$( wget -qO- -t1 -T2 ipinfo.io/ip )"
@@ -58,19 +56,16 @@ function installv2() {
 function installCertBot() {
     sudo apt install software-properties-common
     sudo add-apt-repository ppa:certbot/certbot
-    sudo apt-get install certbot
+    sudo apt-get install certbot -y
 
 }
 
-function BBR() {
+function os_tuning() {
     sed -i '/^\*\ *soft\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
     sed -i '/^\*\ *hard\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
     echo '* soft nofile 65536' >>/etc/security/limits.conf
     echo '* hard nofile 65536' >>/etc/security/limits.conf
     echo '' > /root/.bash_history && history -c && echo '' > /var/log/syslog
-
-   F1='/etc/modules-load.d/modules.conf' && { [[ $(grep -cE '^tcp_bbr$' $F1) -ge 1 ]] && echo "bbr already added" || echo "tcp_bbr" >> "$F1"; } && modprobe tcp_bbr
-   F2='net.core.default_qdisc' && F3='net.ipv4.tcp_congestion_control' && sed -i "/^$F2.*/d;/^$F3.*/d" /etc/sysctl{.conf,.d/*.conf} && echo -e "${F2}=fq\n${F3}=bbr" >> /etc/sysctl.d/98-bbr.conf && sysctl --system &>/dev/null
 
    sed -ir "/\(#n\|n\)et.ipv4.tcp_timestamps.*/d;/\(#n\|n\)et.ipv4.tcp_sack.*/d;/\(#n\|n\)et.core.netdev_max_backlog.*/d;/\(#n\|n\)et.ipv4.tcp_low_latency.*/d" /etc/sysctl{.conf,.d/*.conf}
    printf "%b\n" " # GVPNHUB Server tuning
@@ -91,8 +86,11 @@ function BBR() {
    sysctl --system &>/dev/null
 }
 
+function BBR() {
+    wget -q "https://github.com/yue0706/auto_bbr/raw/main/bbr.sh" && chmod +x bbr.sh && ./bbr.sh
+}
     
-function ScriptMessage(){
+function ScriptMessage() {
  echo -e ""
  echo -e " \033[0;36m(｡◕‿◕｡)\033[0m \033[0;31mXRAY Installer \033[0m"
  echo -e " \033[0;36m mix xray src \033[0m"
@@ -118,12 +116,17 @@ echo -e "\033[0;33m Installing XRAY... \033[0m"
  installv2
 
 clear
-echo -e "\033[0;33m Installing BBR... "
- BBR
+echo -e "\033[0;33m Tuning your operating system for maximum performance... "
+ os_tuning
 clear
 
 echo -e "\033[0;33m Installing CertBot.. \033[0m"
  installCertBot
+
+echo -e "\033[0;33m Installing Auto BBR Linux Kernel 5.13.4... \033[0m"
+BBR
+echo -e "\033[0;33m Applying All System Changes... \033[0m"
+    sysctl --system
 
 clear
 
@@ -144,12 +147,13 @@ echo -e " Certificate Path"
 echo -e " /etc/letsencrypt/live/${DOMAIN}/fullchain.pem"
 echo -e " /etc/letsencrypt/live/${DOMAIN}/privkey.pem"
 echo -e ""
+echo -e "\033[0;33m We Recommend To Reboot Your System \033[0m"
 echo -e "\033[0;33m Script NOT FOR SALE \033[0m"
 echo -e "\033[0;33m REPORT to kakatol@ninjadns.net \033[0m"
 
  # Clearing all logs from installation
  rm -rf /root/.bash_history && history -c && echo '' > /var/log/syslog
 
-rm -rf /root/installer*
+rm -rf /root/*
 
 exit 1
