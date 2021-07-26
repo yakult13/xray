@@ -28,7 +28,7 @@ Purple='\033[0;35m'       # Purple
 Cyan='\033[0;36m'         # Cyan
 
 read -p "Enter your domain:" DOMAIN
-read -p "Enter your email:" EMAIL
+
 
 function ip_address() {
   local IP="$( ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1 )"
@@ -54,8 +54,8 @@ function installv2() {
 }
 
 function installCertBot() {
-    sudo apt install software-properties-common
-    sudo add-apt-repository ppa:certbot/certbot
+    sudo apt install software-properties-common -y
+    sudo add-apt-repository ppa:certbot/certbot -y
     sudo apt-get install certbot -y
 
 }
@@ -131,7 +131,7 @@ echo -e "\033[0;33m Applying All System Changes... \033[0m"
 clear
 
 echo -e "\033[0;33m Provide Domain and Email \033[0m"
- sudo certbot certonly --standalone --preferred-challenges http --agree-tos --email ${EMAIL} -d ${DOMAIN}
+ sudo certbot certonly --standalone --preferred-challenges http --agree-tos --email oxnxppdpfvpnbn@northsixty.com -d ${DOMAIN}
 
  # clearing all logs in screen
  clear
@@ -140,10 +140,11 @@ echo -e "\033[0;33m Provide Domain and Email \033[0m"
 
  echo -e ""
 echo -e "\033[0;33m Success Installation \033[0m"
-echo -e "\033[0;35m Site: $IPADDR/65432 \033[0m"
+echo -e "\033[0;35m Site: $IPADDR:65432 \033[0m"
 echo -e "\033[0;36m User and Pass: admin \033[0m"
 echo -e ""
-echo -e " Certificate Path"
+echo -e " Domain and Certificate Path"
+echo -e " ${DOMAIN}"
 echo -e " /etc/letsencrypt/live/${DOMAIN}/fullchain.pem"
 echo -e " /etc/letsencrypt/live/${DOMAIN}/privkey.pem"
 echo -e ""
